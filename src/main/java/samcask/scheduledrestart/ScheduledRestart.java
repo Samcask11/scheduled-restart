@@ -21,8 +21,8 @@ public class ScheduledRestart implements ModInitializer {
 
 		CommandRegistrationCallback.EVENT.register(RestartCommand::register);
 		ServerLifecycleEvents.SERVER_STARTED.register(server -> {
-			if (config.restartScheduleType.equals("daily") && config.restartInterval > 0) RestartHandler.scheduleAutoRestartDaily(server, config.dailyRestartTimes);
-			else if (config.restartScheduleType.equals("interval") && config.restartInterval > 0) RestartHandler.scheduleAutoRestartInterval(server, config.restartInterval);
+			if (config.restartScheduleType.equals("daily") && config.restartInterval > 0) RestartAutoScheduler.scheduleAutoRestartDaily(server, config.dailyRestartTimes);
+			else if (config.restartScheduleType.equals("interval") && config.restartInterval > 0) RestartAutoScheduler.scheduleAutoRestartInterval(server, config.restartInterval);
 		});
 	}
 

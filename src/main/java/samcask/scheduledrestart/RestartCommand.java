@@ -16,10 +16,10 @@ public class RestartCommand {
                                 RestartHandler.restart(context.getSource().getServer()))
                         .then(CommandManager.argument("delay", TimeArgumentType.time())
                                 .executes((context) ->
-                                        RestartHandler.scheduleRestart(context.getSource().getServer(), (long)IntegerArgumentType.getInteger(context, "delay") / 20))
+                                        RestartScheduler.scheduleRestart(context.getSource().getServer(), (long)IntegerArgumentType.getInteger(context, "delay") / 20))
                         ).then(CommandManager.literal("cancel")
                                 .executes((context) ->
-                                        RestartHandler.cancelRestart())
+                                        RestartScheduler.cancelScheduledRestart())
                         )
         );
     }
