@@ -14,9 +14,9 @@ public class RestartConfig implements ConfigData {
 
     @Comment("Which type of automatic restart scheduling to use. Leave blank to disable automatic scheduled restarts.")
     String restartScheduleType = "daily";
-    @Comment("What times the server should restart each day.\nOnly works if restartScheduleType is set to \"daily\".")
+    @Comment("Restarts the server at these times each day.\nOnly works if restartScheduleType is set to \"daily\".")
     String[] dailyRestartTimes = {"00:00"};
-    @Comment("How many seconds there should be between each restart.\nOnly works if restartScheduleType is set to \"interval\".")
+    @Comment("Restarts the server after it as been online for this many seconds.\nOnly works if restartScheduleType is set to \"interval\".")
     int restartInterval = 86400;
 
     @Comment("How many seconds in advance all players should be warned before a scheduled server restart.")

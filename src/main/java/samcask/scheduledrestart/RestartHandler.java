@@ -23,9 +23,8 @@ public class RestartHandler {
     static String startScriptPath = getStartScriptPath();
     
     public static int restart(MinecraftServer server) {
-        String[] command;
         if (!doesScriptExist()) return 0;
-        command = tryConstructRestartCommand();
+        String[] command = tryConstructRestartCommand();
         if (command == null) return 0;
         ScheduledRestart.logInfo("Automatically restarting server...");
         kickPlayers(server);

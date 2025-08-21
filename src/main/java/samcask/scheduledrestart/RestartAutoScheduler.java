@@ -26,10 +26,16 @@ public class RestartAutoScheduler {
             return;
         }
         initialiseTimes(times);
-        RestartScheduler.scheduleRestart(server, getTimeToNextRestart(times));
+        RestartScheduler.scheduleRestart(server, getTimeToNextDailyRestart(times));
     }
 
-    private static int getTimeToNextRestart(String[] times) {
+    private static void initialiseTimes(String[] times) {
+        currentTime = LocalDateTime.now();
+        restartTime = LocalDateTime.now().with(LocalTime.parse(times[0]));
+        if (currentTime.isAfter(restartTime)) restartTime = restartTime.plusDays(1);
+    }
+
+    private static int getTimeToNextDailyRestart(String[] times) {
         int delay = (int) Duration.between(currentTime, restartTime).toSeconds();
         int smallestDelay = delay;
         for (int i = 1; i < times.length; i++) {
@@ -39,11 +45,5 @@ public class RestartAutoScheduler {
             if (delay < smallestDelay) smallestDelay = delay;
         }
         return smallestDelay;
-    }
-
-    private static void initialiseTimes(String[] times) {
-        currentTime = LocalDateTime.now();
-        restartTime = LocalDateTime.now().with(LocalTime.parse(times[0]));
-        if (currentTime.isAfter(restartTime)) restartTime = restartTime.plusDays(1);
     }
 }
