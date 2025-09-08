@@ -1,10 +1,8 @@
 package samcask.scheduledrestart;
 
-import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.server.MinecraftServer;
 
 import java.time.Duration;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 

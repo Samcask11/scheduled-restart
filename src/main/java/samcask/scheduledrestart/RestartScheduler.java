@@ -3,11 +3,9 @@ package samcask.scheduledrestart;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
-import org.jetbrains.annotations.NotNull;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -82,7 +80,7 @@ public class RestartScheduler {
         Duration timeToRestart = Duration.ofSeconds(secondsToRestart);
         constructRestartWarning(timeToRestart, message);
         message = formatRestartWarning(message);
-        for(ServerPlayerEntity player : server.getPlayerManager().getPlayerList()) player.sendMessageToClient(Text.literal("[Server] " + message), false);
+        for(ServerPlayerEntity player : server.getPlayerManager().getPlayerList()) player.sendMessage(Text.literal("[Server] " + message), false);
         ScheduledRestart.logInfo(message.toString());
     }
 
