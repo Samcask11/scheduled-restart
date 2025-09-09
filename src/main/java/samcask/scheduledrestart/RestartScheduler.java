@@ -80,7 +80,9 @@ public class RestartScheduler {
         Duration timeToRestart = Duration.ofSeconds(secondsToRestart);
         constructRestartWarning(timeToRestart, message);
         message = formatRestartWarning(message);
-        for(ServerPlayerEntity player : server.getPlayerManager().getPlayerList()) player.sendMessage(Text.of("[Server] " + message), false);
+        for(ServerPlayerEntity player : server.getPlayerManager().getPlayerList()) {
+            player.sendMessage(Text.of("[Server] " + message), false);
+        }
         ScheduledRestart.logInfo(message.toString());
     }
 
@@ -91,15 +93,26 @@ public class RestartScheduler {
         if (lastCommaIndex < 0) messageBuilder = message;
         else {
             messageBuilder = new StringBuilder();
-            messageBuilder.append(message, 0, lastCommaIndex).append(" and").append(message, lastCommaIndex + 1, message.toString().length());
+            messageBuilder
+                    .append(message, 0, lastCommaIndex)
+                    .append(" and")
+                    .append(message, lastCommaIndex + 1, message.toString().length());
         }
         return messageBuilder;
     }
 
     private static void constructRestartWarning(Duration timeToRestart, StringBuilder message) {
-        if (timeToRestart.toDaysPart() > 0) message.append(timeToRestart.toDaysPart()).append(timeToRestart.toDaysPart() == 1 ? " day, " : " days, ");
-        if (timeToRestart.toHoursPart() > 0) message.append(timeToRestart.toHoursPart()).append(timeToRestart.toHoursPart() == 1 ? " hour, " : " hours, ");
-        if (timeToRestart.toMinutesPart() > 0) message.append(timeToRestart.toMinutesPart()).append(timeToRestart.toMinutesPart() == 1 ? " minute, " : " minutes, ");
-        if (timeToRestart.toSecondsPart() > 0) message.append(timeToRestart.toSecondsPart()).append(timeToRestart.toSecondsPart() == 1 ? " second, " : " seconds, ");
+        if (timeToRestart.toDaysPart() > 0) message
+                .append(timeToRestart.toDaysPart())
+                .append(timeToRestart.toDaysPart() == 1 ? " day, " : " days, ");
+        if (timeToRestart.toHoursPart() > 0) message
+                .append(timeToRestart.toHoursPart())
+                .append(timeToRestart.toHoursPart() == 1 ? " hour, " : " hours, ");
+        if (timeToRestart.toMinutesPart() > 0) message
+                .append(timeToRestart.toMinutesPart())
+                .append(timeToRestart.toMinutesPart() == 1 ? " minute, " : " minutes, ");
+        if (timeToRestart.toSecondsPart() > 0) message
+                .append(timeToRestart.toSecondsPart())
+                .append(timeToRestart.toSecondsPart() == 1 ? " second, " : " seconds, ");
     }
 }
