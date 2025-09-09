@@ -20,8 +20,8 @@ public class RestartScheduler {
     static ScheduledFuture<?> scheduledManualRestart = null;
     static ScheduledFuture<?> scheduledAutoRestart = null;
     static ScheduledFuture<?> scheduledNoPlayerRestart = null;
-    static ScheduledFuture<?>[] scheduledManualAnnouncements = new ScheduledFuture<?>[]{};
-    static ScheduledFuture<?>[] scheduledAutoAnnouncements = new ScheduledFuture<?>[]{};
+    static ScheduledFuture<?>[] scheduledManualAnnouncements = new ScheduledFuture<?>[ScheduledRestart.config.restartWarningTimes.length];
+    static ScheduledFuture<?>[] scheduledAutoAnnouncements = new ScheduledFuture<?>[ScheduledRestart.config.restartWarningTimes.length];
 
     public enum RestartChannel {
         ManualRestart,
@@ -32,7 +32,7 @@ public class RestartScheduler {
     public static int scheduleRestart(MinecraftServer server, long delaySeconds, RestartChannel restartChannel) {
         cancelScheduledRestart(restartChannel);
         setScheduledRestart(restartChannel, createScheduledRestart(server, delaySeconds));
-        createScheduledAnnouncements(server, delaySeconds, getScheduledAnnouncements(restartChannel));
+        setScheduledAnnouncements(restartChannel, createScheduledAnnouncements(server, delaySeconds));
         ScheduledRestart.logInfo("New restart scheduled at time " + LocalDateTime.now().plusSeconds(delaySeconds));
         return 1;
     }
@@ -56,14 +56,10 @@ public class RestartScheduler {
     public static int cancelScheduledRestart(RestartChannel restartChannel) {
         ScheduledFuture<?> scheduledRestart = getScheduledRestart(restartChannel);
         if (scheduledRestart == null || scheduledRestart.isDone()) return 0;
-        cancelScheduledRestart(scheduledRestart);
+        scheduledRestart.cancel(false);
         cancelScheduledAnnouncements(getScheduledAnnouncements(restartChannel));
         ScheduledRestart.logInfo("Cancelled existing scheduled restart.");
         return 1;
-    }
-
-    private static void cancelScheduledRestart(ScheduledFuture<?> scheduledRestart) {
-        scheduledRestart.cancel(false);
     }
 
     private static void cancelScheduledAnnouncements(ScheduledFuture<?>[] scheduledAnnouncements) {
@@ -92,21 +88,33 @@ public class RestartScheduler {
         );
     }
 
-    private static void createScheduledAnnouncements(MinecraftServer server, long delaySeconds, ScheduledFuture<?>[] scheduledAnnouncements) {
-        for (int i = 0; i < ScheduledRestart.config.restartWarningTimes.length; i++) {
-            tryCreateScheduledAnnouncement(server, delaySeconds, i, scheduledAnnouncements);
-        }
+    private static void setScheduledAnnouncements(RestartChannel restartChannel, ScheduledFuture<?>[] scheduledAnnouncements) {
+        switch (restartChannel) {
+            case ManualRestart:
+                scheduledManualAnnouncements = scheduledAnnouncements;
+            case AutoRestart:
+                scheduledAutoAnnouncements = scheduledAnnouncements;
+        };
     }
 
-    private static void tryCreateScheduledAnnouncement(MinecraftServer server, long delaySeconds, int i, ScheduledFuture<?>[] scheduledAnnouncements) {
+    private static ScheduledFuture<?>[] createScheduledAnnouncements(MinecraftServer server, long delaySeconds) {
+        ScheduledFuture<?>[] scheduledAnnouncements = new ScheduledFuture<?>[ScheduledRestart.config.restartWarningTimes.length];
+        for (int i = 0; i < scheduledAnnouncements.length; i++) {
+            scheduledAnnouncements[i] = tryCreateScheduledAnnouncement(server, delaySeconds, i);
+        }
+        return scheduledAnnouncements;
+    }
+
+    private static ScheduledFuture<?> tryCreateScheduledAnnouncement(MinecraftServer server, long delaySeconds, int i) {
         int announcementDelay = ScheduledRestart.config.restartWarningTimes[i];
         if (delaySeconds - announcementDelay > 0) {
-            scheduledAnnouncements[i] = scheduler.schedule(
+            return scheduler.schedule(
                     () -> server.execute(
                             () -> announceRestart(server, announcementDelay)
                     ), delaySeconds - announcementDelay, TimeUnit.SECONDS
             );
         }
+        return null;
     }
 
     public static void announceRestart(MinecraftServer server, int secondsToRestart) {
