@@ -80,7 +80,7 @@ public class RestartScheduler {
         Duration timeToRestart = Duration.ofSeconds(secondsToRestart);
         constructRestartWarning(timeToRestart, message);
         message = formatRestartWarning(message);
-        for(ServerPlayerEntity player : server.getPlayerManager().getPlayerList()) player.sendMessage(Text.literal("[Server] " + message), false);
+        for(ServerPlayerEntity player : server.getPlayerManager().getPlayerList()) player.sendMessage(Text.of("[Server] " + message), false);
         ScheduledRestart.logInfo(message.toString());
     }
 
