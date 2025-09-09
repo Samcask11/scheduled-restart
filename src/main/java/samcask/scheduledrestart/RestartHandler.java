@@ -71,7 +71,7 @@ public class RestartHandler {
 
     private static void kickPlayers(MinecraftServer server) {
         for (ServerPlayerEntity player : server.getPlayerManager().getPlayerList()) {
-            player.networkHandler.disconnect(Text.literal(ScheduledRestart.config.kickMessage));
+            player.networkHandler.disconnect(Text.of(ScheduledRestart.config.kickMessage));
         }
         ScheduledRestart.logInfo("Successfully disconnected all players");
     }
