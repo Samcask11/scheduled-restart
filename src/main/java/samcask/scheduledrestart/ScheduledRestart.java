@@ -28,6 +28,7 @@ public class ScheduledRestart implements ModInitializer {
 				RestartAutoScheduler.scheduleAutoRestartInterval(server, config.restartInterval);
 			}
 		});
+		ServerLifecycleEvents.SERVER_STARTED.register(RestartNoPlayerScheduler::finalPlayerDisconnected);
 	}
 
 	public static void logInfo(String message) {
