@@ -15,7 +15,7 @@ public class RestartAutoScheduler {
             ScheduledRestart.logInfo("Failed to schedule interval restart, no interval set.");
             return;
         }
-        RestartScheduler.scheduleRestart(server, delaySeconds);
+        RestartScheduler.scheduleRestart(server, delaySeconds, RestartScheduler.RestartChannel.AutoRestart);
     }
 
     public static void scheduleAutoRestartDaily(MinecraftServer server, String[] times) {
@@ -24,7 +24,7 @@ public class RestartAutoScheduler {
             return;
         }
         initialiseTimes(times);
-        RestartScheduler.scheduleRestart(server, getTimeToNextDailyRestart(times));
+        RestartScheduler.scheduleRestart(server, getTimeToNextDailyRestart(times), RestartScheduler.RestartChannel.AutoRestart);
     }
 
     private static void initialiseTimes(String[] times) {

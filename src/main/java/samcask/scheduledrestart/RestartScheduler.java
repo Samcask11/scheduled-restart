@@ -17,53 +17,88 @@ public class RestartScheduler {
         t.setDaemon(true);
         return t;
     });
-    static ScheduledFuture<?> scheduledRestart = null;
-    static ScheduledFuture<?>[] scheduledAnnouncements;
+    static ScheduledFuture<?> scheduledManualRestart = null;
+    static ScheduledFuture<?> scheduledAutoRestart = null;
+    static ScheduledFuture<?> scheduledNoPlayerRestart = null;
+    static ScheduledFuture<?>[] scheduledManualAnnouncements = new ScheduledFuture<?>[]{};
+    static ScheduledFuture<?>[] scheduledAutoAnnouncements = new ScheduledFuture<?>[]{};
 
-    public static int scheduleRestart(MinecraftServer server, long delaySeconds) {
-        cancelScheduledRestart();
-        createSchedulerRestartTask(server, delaySeconds);
-        createSchedulerAnnouncementTasks(server, delaySeconds);
+    public enum RestartChannel {
+        ManualRestart,
+        AutoRestart,
+        NoPlayerRestart
+    }
+
+    public static int scheduleRestart(MinecraftServer server, long delaySeconds, RestartChannel restartChannel) {
+        cancelScheduledRestart(restartChannel);
+        setScheduledRestart(restartChannel, createScheduledRestart(server, delaySeconds));
+        createScheduledAnnouncements(server, delaySeconds, getScheduledAnnouncements(restartChannel));
         ScheduledRestart.logInfo("New restart scheduled at time " + LocalDateTime.now().plusSeconds(delaySeconds));
         return 1;
     }
 
-    public static int cancelScheduledRestart() {
+    public static ScheduledFuture<?> getScheduledRestart(RestartChannel restartChannel) {
+        return switch (restartChannel) {
+            case ManualRestart -> scheduledManualRestart;
+            case AutoRestart -> scheduledAutoRestart;
+            case NoPlayerRestart -> scheduledNoPlayerRestart;
+        };
+    }
+
+    public static ScheduledFuture<?>[] getScheduledAnnouncements(RestartChannel restartChannel) {
+        return switch (restartChannel) {
+            case ManualRestart -> scheduledManualAnnouncements;
+            case AutoRestart -> scheduledAutoAnnouncements;
+            default -> null;
+        };
+    }
+
+    public static int cancelScheduledRestart(RestartChannel restartChannel) {
+        ScheduledFuture<?> scheduledRestart = getScheduledRestart(restartChannel);
         if (scheduledRestart == null || scheduledRestart.isDone()) return 0;
-        cancelSchedulerRestartTask();
-        cancelSchedulerAnnouncementTasks();
+        cancelScheduledRestart(scheduledRestart);
+        cancelScheduledAnnouncements(getScheduledAnnouncements(restartChannel));
         ScheduledRestart.logInfo("Cancelled existing scheduled restart.");
         return 1;
     }
 
-    private static void cancelSchedulerRestartTask() {
+    private static void cancelScheduledRestart(ScheduledFuture<?> scheduledRestart) {
         scheduledRestart.cancel(false);
-        scheduledRestart = null;
     }
 
-    private static void cancelSchedulerAnnouncementTasks() {
+    private static void cancelScheduledAnnouncements(ScheduledFuture<?>[] scheduledAnnouncements) {
+        if (scheduledAnnouncements == null) return;
         for (ScheduledFuture<?> scheduledAnnouncement : scheduledAnnouncements) {
             if (scheduledAnnouncement != null) scheduledAnnouncement.cancel(false);
         }
-        scheduledAnnouncements = null;
     }
 
-    private static void createSchedulerRestartTask(MinecraftServer server, long delaySeconds) {
-        scheduledRestart = scheduler.schedule(
+    private static void setScheduledRestart(RestartChannel restartChannel, ScheduledFuture<?> scheduledRestart) {
+        switch (restartChannel) {
+            case ManualRestart:
+                scheduledManualRestart = scheduledRestart;
+            case AutoRestart:
+                scheduledAutoRestart = scheduledRestart;
+            case NoPlayerRestart:
+                scheduledNoPlayerRestart = scheduledRestart;
+        };
+    }
+
+    private static ScheduledFuture<?> createScheduledRestart(MinecraftServer server, long delaySeconds) {
+        return scheduler.schedule(
                 () -> server.execute(
                         () -> RestartHandler.restart(server)
                 ), delaySeconds, TimeUnit.SECONDS
         );
     }
 
-    private static void createSchedulerAnnouncementTasks(MinecraftServer server, long delaySeconds) {
-        scheduledAnnouncements = new ScheduledFuture<?>[ScheduledRestart.config.restartWarningTimes.length];
+    private static void createScheduledAnnouncements(MinecraftServer server, long delaySeconds, ScheduledFuture<?>[] scheduledAnnouncements) {
         for (int i = 0; i < ScheduledRestart.config.restartWarningTimes.length; i++) {
-            tryCreateSchedulerAnnouncementTask(server, delaySeconds, i);
+            tryCreateScheduledAnnouncement(server, delaySeconds, i, scheduledAnnouncements);
         }
     }
 
-    private static void tryCreateSchedulerAnnouncementTask(MinecraftServer server, long delaySeconds, int i) {
+    private static void tryCreateScheduledAnnouncement(MinecraftServer server, long delaySeconds, int i, ScheduledFuture<?>[] scheduledAnnouncements) {
         int announcementDelay = ScheduledRestart.config.restartWarningTimes[i];
         if (delaySeconds - announcementDelay > 0) {
             scheduledAnnouncements[i] = scheduler.schedule(
@@ -78,8 +113,7 @@ public class RestartScheduler {
         if (secondsToRestart == 0) return;
         StringBuilder message = new StringBuilder("The server will restart in ");
         Duration timeToRestart = Duration.ofSeconds(secondsToRestart);
-        constructRestartWarning(timeToRestart, message);
-        message = formatRestartWarning(message);
+        message = formatRestartWarning(constructRestartWarning(timeToRestart, message));
         for(ServerPlayerEntity player : server.getPlayerManager().getPlayerList()) {
             player.sendMessage(Text.of("[Server] " + message), false);
         }
@@ -101,18 +135,21 @@ public class RestartScheduler {
         return messageBuilder;
     }
 
-    private static void constructRestartWarning(Duration timeToRestart, StringBuilder message) {
-        if (timeToRestart.toDaysPart() > 0) message
-                .append(timeToRestart.toDaysPart())
-                .append(timeToRestart.toDaysPart() == 1 ? " day, " : " days, ");
-        if (timeToRestart.toHoursPart() > 0) message
-                .append(timeToRestart.toHoursPart())
-                .append(timeToRestart.toHoursPart() == 1 ? " hour, " : " hours, ");
-        if (timeToRestart.toMinutesPart() > 0) message
-                .append(timeToRestart.toMinutesPart())
-                .append(timeToRestart.toMinutesPart() == 1 ? " minute, " : " minutes, ");
-        if (timeToRestart.toSecondsPart() > 0) message
-                .append(timeToRestart.toSecondsPart())
-                .append(timeToRestart.toSecondsPart() == 1 ? " second, " : " seconds, ");
+    private static StringBuilder constructRestartWarning(Duration timeToRestart, StringBuilder message) {
+        StringBuilder messageBuilder = new StringBuilder();
+        messageBuilder.append(message);
+        constructRestartWarningSegment(messageBuilder, timeToRestart.toDaysPart(), "day", "days");
+        constructRestartWarningSegment(messageBuilder, timeToRestart.toHoursPart(), "hour", "hours");
+        constructRestartWarningSegment(messageBuilder, timeToRestart.toMinutesPart(), "minute", "minutes");
+        constructRestartWarningSegment(messageBuilder, timeToRestart.toSecondsPart(), "second", "seconds");
+        return messageBuilder;
+    }
+
+    private static void constructRestartWarningSegment(StringBuilder message, long timespan, String singular, String plural) {
+        if (timespan > 0) message
+                .append(timespan)
+                .append(" ")
+                .append(timespan == 1 ? singular : plural)
+                .append(", ");
     }
 }
