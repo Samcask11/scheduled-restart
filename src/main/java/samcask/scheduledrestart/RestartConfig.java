@@ -20,4 +20,7 @@ public class RestartConfig implements ConfigData {
 
     @Comment("How many seconds in advance all players should be warned before a scheduled server restart.")
     int[] restartWarningTimes = {300,30};
+
+    @Comment("Automatically restarts the server after no players have been online for this many seconds.\nSet to 0 to disable restarting while no players are online.")
+    int noPlayerRestartDelay = 3600;
 }
