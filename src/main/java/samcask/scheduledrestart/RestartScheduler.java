@@ -33,7 +33,7 @@ public class RestartScheduler {
         cancelScheduledRestart(restartChannel);
         setScheduledRestart(restartChannel, createScheduledRestart(server, delaySeconds));
         setScheduledAnnouncements(restartChannel, createScheduledAnnouncements(server, delaySeconds));
-        ScheduledRestart.logInfo("New restart scheduled at time " + LocalDateTime.now().plusSeconds(delaySeconds));
+        ScheduledRestart.logInfo("New restart scheduled on channel " + restartChannel + " at time " + LocalDateTime.now().plusSeconds(delaySeconds));
         return 1;
     }
 
@@ -58,7 +58,7 @@ public class RestartScheduler {
         if (scheduledRestart == null || scheduledRestart.isDone()) return 0;
         scheduledRestart.cancel(false);
         cancelScheduledAnnouncements(getScheduledAnnouncements(restartChannel));
-        ScheduledRestart.logInfo("Cancelled existing scheduled restart.");
+        ScheduledRestart.logInfo("Cancelled existing scheduled restart on channel " + restartChannel);
         return 1;
     }
 
@@ -73,8 +73,10 @@ public class RestartScheduler {
         switch (restartChannel) {
             case ManualRestart:
                 scheduledManualRestart = scheduledRestart;
+                break;
             case AutoRestart:
                 scheduledAutoRestart = scheduledRestart;
+                break;
             case NoPlayerRestart:
                 scheduledNoPlayerRestart = scheduledRestart;
         };
@@ -92,6 +94,7 @@ public class RestartScheduler {
         switch (restartChannel) {
             case ManualRestart:
                 scheduledManualAnnouncements = scheduledAnnouncements;
+                break;
             case AutoRestart:
                 scheduledAutoAnnouncements = scheduledAnnouncements;
         };
