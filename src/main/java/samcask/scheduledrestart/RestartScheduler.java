@@ -22,6 +22,7 @@ public class RestartScheduler {
     static ScheduledFuture<?> scheduledNoPlayerRestart = null;
     static ScheduledFuture<?>[] scheduledManualAnnouncements = new ScheduledFuture<?>[ScheduledRestart.config.restartWarningTimes.length];
     static ScheduledFuture<?>[] scheduledAutoAnnouncements = new ScheduledFuture<?>[ScheduledRestart.config.restartWarningTimes.length];
+    static ScheduledFuture<?>[] scheduledNoPlayerAnnouncements = new ScheduledFuture<?>[ScheduledRestart.config.restartWarningTimes.length];
 
     public enum RestartChannel {
         ManualRestart,
@@ -49,7 +50,7 @@ public class RestartScheduler {
         return switch (restartChannel) {
             case ManualRestart -> scheduledManualAnnouncements;
             case AutoRestart -> scheduledAutoAnnouncements;
-            default -> null;
+            case NoPlayerRestart -> scheduledNoPlayerAnnouncements;
         };
     }
 
@@ -97,6 +98,9 @@ public class RestartScheduler {
                 break;
             case AutoRestart:
                 scheduledAutoAnnouncements = scheduledAnnouncements;
+                break;
+            case NoPlayerRestart:
+                scheduledNoPlayerAnnouncements = scheduledAnnouncements;
         };
     }
 
@@ -125,10 +129,7 @@ public class RestartScheduler {
         StringBuilder message = new StringBuilder("The server will restart in ");
         Duration timeToRestart = Duration.ofSeconds(secondsToRestart);
         message = formatRestartWarning(constructRestartWarning(timeToRestart, message));
-        for(ServerPlayerEntity player : server.getPlayerManager().getPlayerList()) {
-            player.sendMessage(Text.of("[Server] " + message), false);
-        }
-        ScheduledRestart.logInfo(message.toString());
+        ScheduledRestart.sendAnnouncement(server, message.toString(), true);
     }
 
     private static StringBuilder formatRestartWarning(StringBuilder message) {
