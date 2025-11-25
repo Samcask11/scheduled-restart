@@ -1,8 +1,9 @@
-package samcask.scheduledrestart;
+package samcask.scheduledrestart.scheduling;
 
 import net.minecraft.server.MinecraftServer;
+import samcask.scheduledrestart.ScheduledRestart;
 
-public class RestartNoPlayerScheduler {
+public class NoPlayerRestart {
     public static void playerConnected() {
         RestartScheduler.cancelScheduledRestart(RestartScheduler.RestartChannel.NoPlayerRestart);
     }
@@ -12,7 +13,7 @@ public class RestartNoPlayerScheduler {
     }
 
     public static void finalPlayerDisconnected(MinecraftServer server) {
-        if (ScheduledRestart.CONFIG.noPlayerRestartDelay.value <= 0) return;
-        RestartScheduler.scheduleRestart(server, ScheduledRestart.CONFIG.noPlayerRestartDelay.value, RestartScheduler.RestartChannel.NoPlayerRestart);
+        if (ScheduledRestart.CONFIG.noPlayerRestartDelay <= 0) return;
+        RestartScheduler.scheduleRestart(server, ScheduledRestart.CONFIG.noPlayerRestartDelay, RestartScheduler.RestartChannel.NoPlayerRestart);
     }
 }

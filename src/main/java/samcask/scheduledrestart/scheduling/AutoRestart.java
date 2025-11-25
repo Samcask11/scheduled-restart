@@ -1,13 +1,14 @@
-package samcask.scheduledrestart;
+package samcask.scheduledrestart.scheduling;
 
 import net.minecraft.server.MinecraftServer;
+import samcask.scheduledrestart.ScheduledRestart;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 
-public class RestartAutoScheduler {
+public class AutoRestart {
     static LocalDateTime currentTime;
     static LocalDateTime restartTime;
 

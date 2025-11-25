@@ -11,7 +11,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import samcask.scheduledrestart.RestartNoPlayerScheduler;
+import samcask.scheduledrestart.scheduling.NoPlayerRestart;
 
 @Mixin(PlayerManager.class)
 public abstract class PlayerManagerMixin {
@@ -21,11 +21,11 @@ public abstract class PlayerManagerMixin {
 
     @Inject(method = "onPlayerConnect", at = @At("HEAD"))
 	public void playerConnected(ClientConnection connection, ServerPlayerEntity player, ConnectedClientData clientData, CallbackInfo info) {
-		RestartNoPlayerScheduler.playerConnected();
+		NoPlayerRestart.playerConnected();
 	}
 
 	@Inject(method = "remove", at = @At("TAIL"))
 	private void playerDisconnected(ServerPlayerEntity player, CallbackInfo info) {
-		RestartNoPlayerScheduler.playerDisconnected(server);
+		NoPlayerRestart.playerDisconnected(server);
 	}
 }
