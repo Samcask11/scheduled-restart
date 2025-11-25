@@ -4,7 +4,7 @@ import net.minecraft.server.MinecraftServer;
 import samcask.scheduledrestart.ScheduledRestart;
 
 import java.time.LocalDateTime;
-import java.util.Dictionary;
+import java.util.HashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -16,8 +16,8 @@ public class RestartScheduler {
         t.setDaemon(true);
         return t;
     });
-    static Dictionary<RestartScheduler.RestartChannel, ScheduledFuture<?>> scheduledRestarts;
-    static Dictionary<RestartScheduler.RestartChannel, ScheduledFuture<?>[]> scheduledAnnouncements;
+    static HashMap<RestartChannel, ScheduledFuture<?>> scheduledRestarts = new HashMap<>();
+    static HashMap<RestartScheduler.RestartChannel, ScheduledFuture<?>[]> scheduledAnnouncements = new HashMap<>();
 
     public enum RestartChannel {
         ManualRestart,
