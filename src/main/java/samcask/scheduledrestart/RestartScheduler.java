@@ -20,9 +20,9 @@ public class RestartScheduler {
     static ScheduledFuture<?> scheduledManualRestart = null;
     static ScheduledFuture<?> scheduledAutoRestart = null;
     static ScheduledFuture<?> scheduledNoPlayerRestart = null;
-    static ScheduledFuture<?>[] scheduledManualAnnouncements = new ScheduledFuture<?>[ScheduledRestart.config.restartWarningTimes.length];
-    static ScheduledFuture<?>[] scheduledAutoAnnouncements = new ScheduledFuture<?>[ScheduledRestart.config.restartWarningTimes.length];
-    static ScheduledFuture<?>[] scheduledNoPlayerAnnouncements = new ScheduledFuture<?>[ScheduledRestart.config.restartWarningTimes.length];
+    static ScheduledFuture<?>[] scheduledManualAnnouncements = new ScheduledFuture<?>[ScheduledRestart.CONFIG.restartWarningTimes.value.size()];
+    static ScheduledFuture<?>[] scheduledAutoAnnouncements = new ScheduledFuture<?>[ScheduledRestart.CONFIG.restartWarningTimes.value.size()];
+    static ScheduledFuture<?>[] scheduledNoPlayerAnnouncements = new ScheduledFuture<?>[ScheduledRestart.CONFIG.restartWarningTimes.value.size()];
 
     public enum RestartChannel {
         ManualRestart,
@@ -105,7 +105,7 @@ public class RestartScheduler {
     }
 
     private static ScheduledFuture<?>[] createScheduledAnnouncements(MinecraftServer server, long delaySeconds) {
-        ScheduledFuture<?>[] scheduledAnnouncements = new ScheduledFuture<?>[ScheduledRestart.config.restartWarningTimes.length];
+        ScheduledFuture<?>[] scheduledAnnouncements = new ScheduledFuture<?>[ScheduledRestart.CONFIG.restartWarningTimes.value.size()];
         for (int i = 0; i < scheduledAnnouncements.length; i++) {
             scheduledAnnouncements[i] = tryCreateScheduledAnnouncement(server, delaySeconds, i);
         }
@@ -113,7 +113,7 @@ public class RestartScheduler {
     }
 
     private static ScheduledFuture<?> tryCreateScheduledAnnouncement(MinecraftServer server, long delaySeconds, int i) {
-        int announcementDelay = ScheduledRestart.config.restartWarningTimes[i];
+        int announcementDelay = ScheduledRestart.CONFIG.restartWarningTimes.value.get(i);
         if (delaySeconds - announcementDelay > 0) {
             return scheduler.schedule(
                     () -> server.execute(
