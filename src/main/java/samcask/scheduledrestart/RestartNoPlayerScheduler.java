@@ -12,7 +12,7 @@ public class RestartNoPlayerScheduler {
     }
 
     public static void finalPlayerDisconnected(MinecraftServer server) {
-        if (ScheduledRestart.config.noPlayerRestartDelay <= 0) return;
-        RestartScheduler.scheduleRestart(server, ScheduledRestart.config.noPlayerRestartDelay, RestartScheduler.RestartChannel.NoPlayerRestart);
+        if (ScheduledRestart.CONFIG.noPlayerRestartDelay.value <= 0) return;
+        RestartScheduler.scheduleRestart(server, ScheduledRestart.CONFIG.noPlayerRestartDelay.value, RestartScheduler.RestartChannel.NoPlayerRestart);
     }
 }
