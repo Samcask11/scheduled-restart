@@ -49,9 +49,9 @@ public class RestartHandler {
 
     private static String getStartScriptPath() {
         String startScriptPath;
-        boolean scriptPathDefinedInConfig = !ScheduledRestart.config.startScriptPath.isEmpty();
+        boolean scriptPathDefinedInConfig = !ScheduledRestart.CONFIG.startScriptPath.value.isEmpty();
         if (scriptPathDefinedInConfig) {
-            startScriptPath = ScheduledRestart.config.startScriptPath;
+            startScriptPath = ScheduledRestart.CONFIG.startScriptPath.value;
         } else if (os.contains("win")) {
             startScriptPath = "start.bat";
         } else {
@@ -71,7 +71,7 @@ public class RestartHandler {
 
     private static void kickPlayers(MinecraftServer server) {
         for (ServerPlayerEntity player : server.getPlayerManager().getPlayerList()) {
-            player.networkHandler.disconnect(Text.of(ScheduledRestart.config.kickMessage));
+            player.networkHandler.disconnect(Text.of(ScheduledRestart.CONFIG.kickMessage.value));
         }
         ScheduledRestart.logInfo("Successfully disconnected all players");
     }
