@@ -47,7 +47,7 @@ public class RestartHandler {
         ScheduledRestart.logInfo("Disconnecting players...");
         try {
             for (ServerPlayerEntity player : server.getPlayerManager().getPlayerList()) {
-                player.networkHandler.disconnect(Text.of(ScheduledRestart.CONFIG.kickMessage));
+                player.networkHandler.disconnect(Text.method_30163(ScheduledRestart.CONFIG.kickMessage));
             }
             ScheduledRestart.logInfo("Successfully disconnected all players");
         } catch (Exception e) {

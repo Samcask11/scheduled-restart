@@ -8,8 +8,6 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import samcask.scheduledrestart.config.OldConfigData;
 import samcask.scheduledrestart.config.RestartConfig;
 import samcask.scheduledrestart.scheduling.AutoRestart;
@@ -18,10 +16,12 @@ import samcask.scheduledrestart.scheduling.NoPlayerRestart;
 
 import java.io.File;
 import java.nio.file.Path;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 public class ScheduledRestart implements ModInitializer {
 	public static final String MOD_ID = "scheduled-restart";
-	public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
+	public static final Logger LOGGER = LogManager.getLogger(MOD_ID);
 	public static RestartConfig CONFIG;
 
 	@Override
@@ -64,7 +64,7 @@ public class ScheduledRestart implements ModInitializer {
 
 	public static void sendAnnouncement(MinecraftServer server, String message, boolean logMessage) {
 		for(ServerPlayerEntity player : server.getPlayerManager().getPlayerList()) {
-			player.sendMessage(Text.of("[Server] " + message), false);
+			player.sendMessage(Text.method_30163("[Server] " + message), false);
 		}
 		if (logMessage) logInfo(message);
 	}
