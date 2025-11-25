@@ -10,6 +10,11 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import samcask.scheduledrestart.config.OldConfigData;
+import samcask.scheduledrestart.config.RestartConfig;
+import samcask.scheduledrestart.scheduling.AutoRestart;
+import samcask.scheduledrestart.scheduling.ManualRestart;
+import samcask.scheduledrestart.scheduling.NoPlayerRestart;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -24,27 +29,29 @@ public class ScheduledRestart implements ModInitializer {
 		Path configPath = FabricLoader.getInstance().getConfigDir();
 		File configFile = configPath.resolve("scheduled-restart.properties").toFile();
 		Path oldConfigPath = configPath.resolve("scheduled-restart.json5");
-		if (oldConfigPath.toFile().isFile() && !configFile.isFile()) {
+		if (oldConfigPath.toFile().isFile()) {
 			try {
-				OldRestartConfig OLD_CONFIG = new OldRestartConfig(oldConfigPath);
+				OldConfigData OLD_CONFIG = new OldConfigData(oldConfigPath);
 				CONFIG = new RestartConfig(configFile, OLD_CONFIG);
 			} catch (Exception e) {
+				logInfo(e.toString());
 				CONFIG = new RestartConfig(configFile);
 			}
+			oldConfigPath.toFile().delete();
 		} else {
 			CONFIG = new RestartConfig(configFile);
 		}
 
-		CommandRegistrationCallback.EVENT.register(RestartCommand::register);
+		CommandRegistrationCallback.EVENT.register(ManualRestart::register);
 		ServerLifecycleEvents.SERVER_STARTED.register(server -> {
-			if (CONFIG.restartScheduleType.value.equals("daily") && CONFIG.restartInterval.value > 0) {
-				RestartAutoScheduler.scheduleAutoRestartDaily(server, CONFIG.dailyRestartTimes.value);
+			if (CONFIG.restartScheduleType.equals("daily") && CONFIG.restartInterval > 0) {
+				AutoRestart.scheduleAutoRestartDaily(server, CONFIG.dailyRestartTimes);
 			}
-			else if (CONFIG.restartScheduleType.value.equals("interval") && CONFIG.restartInterval.value > 0) {
-				RestartAutoScheduler.scheduleAutoRestartInterval(server, CONFIG.restartInterval.value);
+			else if (CONFIG.restartScheduleType.equals("interval") && CONFIG.restartInterval > 0) {
+				AutoRestart.scheduleAutoRestartInterval(server, CONFIG.restartInterval);
 			}
 		});
-		ServerLifecycleEvents.SERVER_STARTED.register(RestartNoPlayerScheduler::finalPlayerDisconnected);
+		ServerLifecycleEvents.SERVER_STARTED.register(NoPlayerRestart::finalPlayerDisconnected);
 	}
 
 	public static void logInfo(String message) {

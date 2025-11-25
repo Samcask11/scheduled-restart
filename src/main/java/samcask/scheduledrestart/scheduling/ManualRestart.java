@@ -1,4 +1,4 @@
-package samcask.scheduledrestart;
+package samcask.scheduledrestart.scheduling;
 
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
@@ -6,7 +6,7 @@ import net.minecraft.command.argument.TimeArgumentType;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 
-public class RestartCommand {
+public class ManualRestart {
 
     public static void register(CommandDispatcher<ServerCommandSource> dispatcher, boolean dedicated) {
         dispatcher.register(
