@@ -5,9 +5,9 @@ import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.text.Text;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import samcask.scheduledrestart.config.OldConfigData;
@@ -63,8 +63,8 @@ public class ScheduledRestart implements ModInitializer {
 	}
 
 	public static void sendAnnouncement(MinecraftServer server, String message, boolean logMessage) {
-		for(ServerPlayer player : server.getPlayerList().getPlayers()) {
-			player.displayClientMessage(Component.nullToEmpty("[Server] " + message), false);
+		for(ServerPlayerEntity player : server.getPlayerManager().getPlayerList()) {
+			player.sendMessage(Text.of("[Server] " + message), false);
 		}
 		if (logMessage) logInfo(message);
 	}
