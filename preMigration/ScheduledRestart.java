@@ -3,11 +3,11 @@ package samcask.scheduledrestart;
 import net.fabricmc.api.ModInitializer;
 
 import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
-import net.fabricmc.fabric.api.event.server.ServerStartCallback;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.text.Text;
 import samcask.scheduledrestart.config.OldConfigData;
 import samcask.scheduledrestart.config.RestartConfig;
 import samcask.scheduledrestart.scheduling.AutoRestart;
@@ -43,7 +43,7 @@ public class ScheduledRestart implements ModInitializer {
 		}
 
 		CommandRegistrationCallback.EVENT.register(ManualRestart::register);
-		ServerStartCallback.EVENT.register(server -> {
+		ServerLifecycleEvents.SERVER_STARTED.register(server -> {
 			if (CONFIG.restartScheduleType.equals("daily") && CONFIG.restartInterval > 0) {
 				AutoRestart.scheduleAutoRestartDaily(server, CONFIG.dailyRestartTimes);
 			}
@@ -51,7 +51,7 @@ public class ScheduledRestart implements ModInitializer {
 				AutoRestart.scheduleAutoRestartInterval(server, CONFIG.restartInterval);
 			}
 		});
-		ServerStartCallback.EVENT.register(NoPlayerRestart::finalPlayerDisconnected);
+		ServerLifecycleEvents.SERVER_STARTED.register(NoPlayerRestart::finalPlayerDisconnected);
 	}
 
 	public static void logInfo(String message) {
@@ -63,8 +63,8 @@ public class ScheduledRestart implements ModInitializer {
 	}
 
 	public static void sendAnnouncement(MinecraftServer server, String message, boolean logMessage) {
-		for(ServerPlayer player : server.getPlayerList().getPlayers()) {
-			player.displayClientMessage(Component.nullToEmpty("[Server] " + message), false);
+		for(ServerPlayerEntity player : server.getPlayerManager().getPlayerList()) {
+			player.sendMessage(Text.method_30163("[Server] " + message), false);
 		}
 		if (logMessage) logInfo(message);
 	}
