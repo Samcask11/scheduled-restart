@@ -3,7 +3,6 @@ package samcask.scheduledrestart;
 import net.fabricmc.api.ModInitializer;
 
 import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.server.ServerStartCallback;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.network.chat.Component;
@@ -44,7 +43,7 @@ public class ScheduledRestart implements ModInitializer {
 		}
 
 		CommandRegistrationCallback.EVENT.register(ManualRestart::register);
-		ServerLifecycleEvents.SERVER_STARTED.register(server -> {
+		ServerStartCallback.EVENT.register(server -> {
 			if (CONFIG.restartScheduleType.equals("daily") && CONFIG.restartInterval > 0) {
 				AutoRestart.scheduleAutoRestartDaily(server, CONFIG.dailyRestartTimes);
 			}
@@ -52,7 +51,7 @@ public class ScheduledRestart implements ModInitializer {
 				AutoRestart.scheduleAutoRestartInterval(server, CONFIG.restartInterval);
 			}
 		});
-		ServerLifecycleEvents.SERVER_STARTED.register(NoPlayerRestart::finalPlayerDisconnected);
+		ServerStartCallback.EVENT.register(NoPlayerRestart::finalPlayerDisconnected);
 	}
 
 	public static void logInfo(String message) {
