@@ -59,7 +59,7 @@ public class RestartHandler {
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             try {
                 Runtime.getRuntime().exec(command, null, rootPath.toFile());
-            } catch (IOException e) {
+            } catch (Exception e) {
                 ScheduledRestart.logError("Error while adding shutdown hook: " + e);
             }
         }));

@@ -55,11 +55,11 @@ public class ScheduledRestart implements ModInitializer {
 	}
 
 	public static void logInfo(String message) {
-		ScheduledRestart.LOGGER.info("[ScheduledRestartMod] - " + message);
+		LOGGER.info("[ScheduledRestartMod] - " + message);
 	}
 
 	public static void logError(String message) {
-		ScheduledRestart.LOGGER.error("[ScheduledRestartMod] - " + message);
+		LOGGER.error("[ScheduledRestartMod] - " + message);
 	}
 
 	public static void sendAnnouncement(MinecraftServer server, String message, boolean logMessage) {
