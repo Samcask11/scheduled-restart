@@ -9,7 +9,7 @@ public class NoPlayerRestart {
     }
 
     public static void playerDisconnected(MinecraftServer server) {
-        if (server.getPlayerCount() == 0) finalPlayerDisconnected(server);
+        if (server.getCurrentPlayerCount() == 0) finalPlayerDisconnected(server);
     }
 
     public static void finalPlayerDisconnected(MinecraftServer server) {
