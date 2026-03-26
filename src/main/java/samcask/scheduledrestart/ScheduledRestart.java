@@ -6,6 +6,7 @@ import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.PlayerChatMessage;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import org.slf4j.Logger;
@@ -64,7 +65,7 @@ public class ScheduledRestart implements ModInitializer {
 
 	public static void sendAnnouncement(MinecraftServer server, String message, boolean logMessage) {
 		for(ServerPlayer player : server.getPlayerList().getPlayers()) {
-			player.displayClientMessage(Component.nullToEmpty("[Server] " + message), false);
+			player.sendSystemMessage(Component.nullToEmpty("[Server] " + message), false);
 		}
 		if (logMessage) logInfo(message);
 	}
