@@ -1,6 +1,6 @@
 package samcask.scheduledrestart.scheduling;
 
-import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import samcask.scheduledrestart.ScheduledRestart;
@@ -47,7 +47,7 @@ public class RestartHandler {
         ScheduledRestart.logInfo("Disconnecting players...");
         try {
             for (ServerPlayer player : server.getPlayerList().getPlayers()) {
-                player.connection.disconnect(Component.nullToEmpty(ScheduledRestart.CONFIG.kickMessage));
+                player.connection.disconnect(new TextComponent(ScheduledRestart.CONFIG.kickMessage));
             }
             ScheduledRestart.logInfo("Successfully disconnected all players");
         } catch (Exception e) {

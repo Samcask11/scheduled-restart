@@ -8,7 +8,7 @@ import net.minecraft.commands.arguments.TimeArgument;
 
 public class ManualRestart {
 
-    public static void register(CommandDispatcher<CommandSourceStack> dispatcher, boolean dedicated) {
+    public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
         dispatcher.register(
                 Commands.literal("restart")
                         .executes((context) ->
